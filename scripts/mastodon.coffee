@@ -3,14 +3,15 @@ module.exports = (robot) ->
   child_process = require 'child_process'
 
   github = require('githubot')(robot, errorHandler: (response) ->
-    msg.send "```#{response.error}```🤔"
-    )
+    envelope = room: "mastodon"
+    robot.send envelope, "```#{response.error}```🤔"
+  )
 
   merge = (msg, target) ->
     github.get "/repos/tootsuite/mastodon/branches/master", (master) ->
-      github.branches(REPO).merge master.commit.sha,
-        into: target, () ->
-          msg.send "マージ成功🎉"
+      msg.send "merge upstream/master into #{target}"
+      github.branches(REPO).merge master.commit.sha, into: target, (mergeCommit) ->
+      msg.send mergeCommit.message
 
   current_branch = () -> robot.brain.get "branch"
 
@@ -18,8 +19,8 @@ module.exports = (robot) ->
     target = current_branch()
     if !target
       msg.send "checkout target branch before merging"
-    else
-      merge(msg, target)
+      return
+    merge(msg, target)
 
   robot.respond /checkout (.+)/i, (msg) ->
     branch = msg.match[1]
@@ -27,12 +28,12 @@ module.exports = (robot) ->
       msg.send "enter branch name"
       return
     robot.brain.set "branch", branch
-    msg.send branch
+    msg.send "Current target branch is set to *#{target}*"
 
   robot.respond /branch/i, (msg) ->
     github.branches REPO, (branches) ->
       msg.send branches.map((b) -> "* #{b.name}").join "\n"
-      msg.send "current_branch: #{current_branch()}"
+      msg.send "Current target branch: *#{current_branch()}*"
 
   robot.respond /(デプロイ|でっぷろーい)/i, (msg) ->
     child_process.exec "scripts/shell/deploy.sh #{current_branch()} hubot", (error, stdout, stderr) ->
