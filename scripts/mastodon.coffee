@@ -11,7 +11,7 @@ module.exports = (robot) ->
     github.get "/repos/tootsuite/mastodon/branches/master", (master) ->
       msg.send "merge upstream/master into #{target}"
       github.branches(REPO).merge master.commit.sha, into: target, (mergeCommit) ->
-      msg.send mergeCommit.message
+        msg.send mergeCommit.message
 
   current_branch = () -> robot.brain.get "branch"
 
@@ -38,7 +38,7 @@ module.exports = (robot) ->
   robot.respond /(デプロイ|でっぷろーい)/i, (msg) ->
     child_process.exec "scripts/shell/deploy.sh #{current_branch()} hubot", (error, stdout, stderr) ->
       if !error
-        msg.send "🎉\n" + stdout
+        msg.send "```#{stdout}```🎉"
       else
         msg.send "```#{stderr}```🤔"
 
@@ -46,7 +46,7 @@ module.exports = (robot) ->
     msg.send "🐘＜アップデートなう"
     child_process.exec "scripts/shell/chase_master.sh hubot", (error, stdout, stderr) ->
       if !error
-        msg.send "アップデート完了🎉\n" + stdout
+        msg.send "```#{stdout}```アップデート完了🎉"
       else
         msg.send "```#{stderr}```🤔"
 
@@ -57,13 +57,13 @@ module.exports = (robot) ->
         msg.send "🌴リフレッシュ完了🌴"
 
       else
-        msg.send "```#{stderr}```\n🤔リフレッシュ失敗"
+        msg.send "```#{stderr}```\n🤔"
 
   robot.respond /再起動/i, (msg) ->
     msg.send "🐘＜`sudo systemctl restart mastodon-*.service`"
     child_process.exec "sudo systemctl restart mastodon-*.service", (error, stdout, stdercocr) ->
       if !error
-        msg.send "```#{stdout}```OK🎉"
+        msg.send "```#{stdout}```🎉"
       else
         msg.send "```#{stderr}```🤔"
 
