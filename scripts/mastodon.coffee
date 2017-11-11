@@ -1,9 +1,11 @@
 REPO = process.env.REPO
+CHANNEL = process.env.CHANNEL
+
 module.exports = (robot) ->
   child_process = require 'child_process'
 
   github = require('githubot')(robot, errorHandler: (response) ->
-    envelope = room: "mastodon"
+    envelope = room: CHANNEL
     robot.send envelope, "```#{response.error}```🤔"
   )
 
