@@ -18,7 +18,7 @@ module.exports = (robot) ->
     target = current_branch()
     if !target
       msg.send "checkout target branch before merging"
-      return
+    else
       merge(msg, target)
 
   robot.respond /checkout (.+)/i, (msg) ->
