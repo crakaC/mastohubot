@@ -14,7 +14,7 @@ module.exports = (robot) ->
 
   current_branch = () -> robot.brain.get "branch"
 
-  robot.respond /{masterマージ|merge master}/i, (msg) ->
+  robot.respond /(masterマージ|merge master)/i, (msg) ->
     target = current_branch()
     if !target
       msg.send "checkout target branch before merging"
@@ -34,7 +34,7 @@ module.exports = (robot) ->
       msg.send branches.map((b) -> "* #{b.name}").join "\n"
       msg.send "current_branch: #{current_branch()}"
 
-  robot.respond /{デプロイ|でっぷろーい}/i, (msg) ->
+  robot.respond /(デプロイ|でっぷろーい)/i, (msg) ->
     child_process.exec "scripts/shell/deploy.sh #{current_branch()} hubot", (error, stdout, stderr) ->
       if !error
         msg.send "🎉\n" + stdout
