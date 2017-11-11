@@ -28,7 +28,7 @@ module.exports = (robot) ->
       msg.send "enter branch name"
       return
     robot.brain.set "branch", branch
-    msg.send "Current target branch is set to *#{target}*"
+    msg.send "Current target branch is set to *#{branch}*"
 
   robot.respond /branch/i, (msg) ->
     github.branches REPO, (branches) ->
