@@ -14,6 +14,7 @@ module.exports = (robot) ->
       msg.send "merge upstream/master into #{target}"
       github.branches(REPO).merge master.commit.sha, into: target, (mergeCommit) ->
         msg.send mergeCommit.message
+        robot.brain.set "hash", master.commit.sha.substr(0, 7)
 
   current_branch = () -> robot.brain.get "branch"
 
@@ -40,7 +41,7 @@ module.exports = (robot) ->
   robot.respond /(デプロイ|でっぷろーい)/i, (msg) ->
     child_process.exec "scripts/shell/deploy.sh #{current_branch()} hubot", (error, stdout, stderr) ->
       if !error
-        msg.send "```#{stdout}```🎉"
+        msg.send "だん！ `#{robot.brain.get "hash"}`"
       else
         msg.send "```#{stderr}```🤔"
 
